@@ -1,15 +1,26 @@
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  // entry point
-  entry: ['@babel/polyfill', './src/js/resize-image.js'],
+  entry: './src/js/entry.js',
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'resize.js'
+    path: path.resolve(__dirname, 'resize'),
+    filename: 'index.js'
+  },
+  devServer: {
+    contentBase: path.resolve('./resize'),
+    index: 'index.html',
+    port: 8080
   },
   module: {
     rules: [
+      {
+        test: /\.html$/,
+        use: {
+          loader: 'html-loader'
+        }
+      },
       {
         test: /\.js$/,
         include: [
@@ -27,10 +38,14 @@ module.exports = {
     ]
   },
   plugins: [
+    new HtmlWebPackPlugin({
+      template: './src/index.html',
+      filename: 'index.html'
+    }),
     new CleanWebpackPlugin({
-      cleanAfterEveryBuildPatterns: ['dist']
+      cleanAfterEveryBuildPatterns: ['resize']
     }),
   ],
   devtool: 'source-map',
-  mode: 'development'
+  mode: 'none'
 };
