@@ -1,29 +1,42 @@
 # resize-image
 
 - 이미지 리사이징 모듈
-- **promise**기반으로 되어 있기 때문에 아래와 같은 polyfill import가 필요함.
-  ```html
-  <!-- Automatically provides/replaces `Promise` if missing or broken. -->
-  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js"></script>
+- **webpack**기반으로 되어 있기 때문에 `npm script`에 있는 명령어들만 잘 사용하면 됨.
 
-  <!-- Minified version of `es6-promise-auto` below. -->
-  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.min.js"></script>
-  ```
-- 사용법
+- ## build
+  - prod : entry => resize-image.js
+  - dev : entry => tc-event.js
+
+- ## npm script
+  - prod-build : prod 버전 build
+  - dev-server : webpack-dev-server 기동
+
+- ## use
   ```javascript
-  window.imageResize(args, { width: 600, height: 600 })
-    .then(function (resp) { 
-      // do something
-    });
+  document.getElementById('resize').addEventListener('change', (e) => {
+    const resize = new Resize(1000000);
+    const file = e.target.files[0];
+    const size = { width: 600, height: 600 };
+
+    console.log(`File start : ${file}`);
+
+    resize.resize(file, size)
+      .then(resp => console.log('File result : ', resp));
+  });
+
+  document.getElementById('urlTest').addEventListener('click', (e) => {
+    const resize = new Resize(1000000);
+    const targetUrl = 'imgUrl';
+    const size = { width: 600, height: 600 };
+
+    console.log(`Url start : ${targetUrl}`);
+
+    resize.resize(targetUrl, size)
+      .then(resp => console.log('Url result : ', resp));
+  });
   ```
-- etc
-  - webpack + babel
-  - 이슈가 발생하면 수정해주세요.
-    ```
-    ### 커밋명
-    
-    [이슈]
-     - 이슈내용
-    ```
+
+## todo
+  - `generator` 사용하여 순서 보장
+  - `new Resize()`로 생성 시 `target size`에 대한 계산 구현 예정 
+  - url 이미지를 canvas 에 그려서 해당 이미지를 `resize`시 해당 origine size에 대한 고민

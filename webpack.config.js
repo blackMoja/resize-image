@@ -2,8 +2,10 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 
+console.log(`env : ${process.env.NODE_ENV}`);
+
 module.exports = {
-  entry: './src/js/entry.js',
+  entry: process.env.NODE_ENV === 'production' ? './src/js/resize-image.js' : './src/js/tc-event.js',
   output: {
     path: path.resolve(__dirname, 'resize'),
     filename: 'index.js'
@@ -37,15 +39,7 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new HtmlWebPackPlugin({
-      template: './src/index.html',
-      filename: 'index.html'
-    }),
-    new CleanWebpackPlugin({
-      cleanAfterEveryBuildPatterns: ['resize']
-    }),
-  ],
-  devtool: 'source-map',
-  mode: 'none'
+  plugins: process.env.NODE_ENV === 'production' ? [new CleanWebpackPlugin({ cleanAfterEveryBuildPatterns: ['resize'] })] : [new CleanWebpackPlugin({ cleanAfterEveryBuildPatterns: ['resize'] }), new HtmlWebPackPlugin({ template: './src/index.html', filename: 'index.html' })],
+  devtool: process.env.NODE_ENV === 'production' ? 'none' : 'source-map',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development'
 };

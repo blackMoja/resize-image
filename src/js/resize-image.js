@@ -13,8 +13,6 @@ export default class Resize {
   }
 
   resize(target, size) {
-    console.log(this.isFile(target));
-    // convertUrl이 독자적으로 움직일 수 있게끔 조치가 필요함.
     return this.isFile(target) ? this.byPass(target, size) : this.parseUrl(target, size);
   }
 
@@ -52,7 +50,7 @@ export default class Resize {
 
   async parseUrl(target, size) {
     const convertUrl = await this.convertUrl(target, size);
-    return this.urlToBlob(convertUrl, 'download');
+    return this.urlToBlob(convertUrl, 'download.jpg');
   }
 
   convertUrl(parseUrl, size, originSize) {
@@ -69,8 +67,7 @@ export default class Resize {
 
         canvas.getContext('2d').drawImage(img, 0, 0, size.width, size.height);
 
-        // !리펙토링 시작 - 20.02.29
-        // ! originSiz가 없는 경우는 default 300 * 1024 -> Url에서 바로 들어오는 경우가 있기 때문임.
+        // url 일 경우... 300 * 1024 고정이 맞는걸까 ?
         const origin = originSize ? Math.min(originSize, 300 * 1024) : 300 * 1024;
         let q = 0.5;
         let d = 0.5;
