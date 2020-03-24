@@ -9,13 +9,12 @@
  */
 export default class Resize {
   constructor(maximumSize) {
+    // 계산 필요함. mb단위로.
     this.maximumSize = maximumSize;
   }
 
   resize(target, size) {
-    return this.isFile(target)
-      ? this.byPass(target, size)
-      : this.parseUrl(target, size);
+    return this.isFile(target) ? this.byPass(target, size) : this.parseUrl(target, size);
   }
 
   isFile(target) {
@@ -23,9 +22,7 @@ export default class Resize {
   }
 
   async byPass(target, size) {
-    return (await this.checkSize(target))
-      ? target
-      : this.convertFile(target, size);
+    return await this.checkSize(target) ? target : this.convertFile(target, size);
   }
 
   checkSize(target) {
@@ -101,18 +98,13 @@ export default class Resize {
       result.split(",")[0].indexOf("base64") >= 0
         ? atob(result.split(",")[1])
         : encodeURI(result.split(",")[1]);
-    const mime = result
-      .split(",")[0]
-      .split(":")[1]
-      .split(";")[0];
+    const mime = result.split(",")[0].split(":")[1].split(";")[0];
     const max = bytes.length;
     const ia = new Uint8Array(max);
 
     for (let i = 0; i < max; i++) {
       ia[i] = bytes.charCodeAt(i);
     }
-
-    console.log('type : ', mime)
 
     return new File([new Blob([ia], { type: mime })], fileName, { type: mime });
   }

@@ -5,10 +5,8 @@ document.getElementById('resize').addEventListener('change', (e) => {
   const file = e.target.files[0];
   const size = { width: 600, height: 600 };
 
-  console.log(`File start : ${file}`);
-
   resize.resize(file, size)
-    .then(resp => console.log('File result : ', resp));
+    .then(resp => { console.log(resp); })
 });
 
 document.getElementById('urlTest').addEventListener('click', (e) => {
