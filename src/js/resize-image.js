@@ -7,14 +7,21 @@
  *
  * @returns {Files} 리사이징 파일 || 원본 파일 return
  */
+
+// todo generator 들어가서 순서보장 로직 추가하기.
+// submodule로 thumbnail 한번 들고와서 같이 ret object로 넘겨주기.
+
 export default class Resize {
   constructor(maximumSize) {
-    // 계산 필요함. mb단위로.
     this.maximumSize = maximumSize;
   }
 
-  resize(target, size) {
-    return this.isFile(target) ? this.byPass(target, size) : this.parseUrl(target, size);
+  start(target, size) {
+    return this.resize(target, size).next().value;
+  }
+
+  *resize(target, size) {
+    return yield this.isFile(target) ? this.byPass(target, size) : this.parseUrl(target, size);
   }
 
   isFile(target) {
@@ -26,18 +33,14 @@ export default class Resize {
   }
 
   checkSize(target) {
-    return new Promise(resolve => {
-      return resolve(this.maximumSize > target);
-    });
+    return new Promise(resolve => resolve(this.maximumSize > target));
   }
 
   fileToDataurl(target) {
     return new Promise(resolve => {
       const fr = new FileReader();
 
-      fr.onload = e => {
-        return resolve(e.target.result);
-      };
+      fr.onload = e => resolve(e.target.result);
       fr.readAsDataURL(target);
     });
   }
@@ -69,9 +72,7 @@ export default class Resize {
         canvas.getContext("2d").drawImage(img, 0, 0, size.width, size.height);
 
         // url 일 경우... 300 * 1024 고정이 맞는걸까 ?
-        const origin = originSize
-          ? Math.min(originSize, 300 * 1024)
-          : 300 * 1024;
+        const origin = originSize ? Math.min(originSize, 300 * 1024) : 300 * 1024;
         let q = 0.5;
         let d = 0.5;
         let dataUrl = "";
@@ -94,17 +95,12 @@ export default class Resize {
   }
 
   urlToBlob(result, fileName) {
-    const bytes =
-      result.split(",")[0].indexOf("base64") >= 0
-        ? atob(result.split(",")[1])
-        : encodeURI(result.split(",")[1]);
+    const bytes = result.split(",")[0].indexOf("base64") >= 0 ? atob(result.split(",")[1]) : encodeURI(result.split(",")[1]);
     const mime = result.split(",")[0].split(":")[1].split(";")[0];
     const max = bytes.length;
     const ia = new Uint8Array(max);
 
-    for (let i = 0; i < max; i++) {
-      ia[i] = bytes.charCodeAt(i);
-    }
+    for (let i = 0; i < max; i++) ia[i] = bytes.charCodeAt(i);
 
     return new File([new Blob([ia], { type: mime })], fileName, { type: mime });
   }
