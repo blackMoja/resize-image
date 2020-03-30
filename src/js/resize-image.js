@@ -10,6 +10,11 @@
 
 // todo generator 들어가서 순서보장 로직 추가하기.
 // submodule로 thumbnail 한번 들고와서 같이 ret object로 넘겨주기.
+// resize target 단건 || array
+// ㄴ부에서 loop를 돌자
+
+// 단일 파일은 옵션 , params 로 array를 받는 interface
+// array like object도 정상적으로 동작 하게끔.
 
 export default class Resize {
   constructor(maximumSize) {
