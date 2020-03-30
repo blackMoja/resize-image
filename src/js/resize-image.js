@@ -21,32 +21,50 @@ export default class Resize {
     this.maximumSize = maximumSize;
   }
 
-  start(target, size) {
-    return this.resize(target, size).next().value;
+  resize(target, size) {
+    return this.r(target, size).next().value;
   }
 
-  *resize(target, size) {
-    return yield this.isFile(target) ? this.byPass(target, size) : this.parseUrl(target, size);
+  *r(t, s) {
+    // loop를 돌리쟈.
+    // return yield this.isFile(target)
+    //   ? this.byPass(target, size)
+    //   : this.parseUrl(target, size);
+
+    return yield this.isArray(t) ? this.gList(t, s) : this.gOne(t, s);
   }
 
-  isFile(target) {
-    return target instanceof File;
+  isFile(t) {
+    return t instanceof File;
   }
 
-  async byPass(target, size) {
-    return await this.checkSize(target) ? target : this.convertFile(target, size);
+  isArray(t) {
+    return t instanceof Array;
   }
 
-  checkSize(target) {
+  gList(t) {
+    // 추후 file args에 따라서 t에 더 뭔가 붙을 수 있땨. 지금은 proto
+    return [] = arr.map(v => this.isFile(t) ? this.byPass(t) : this.parseUrl(t));
+  }
+
+  gOne(t, s) {
+    return this.isFile(t) ? this.byPass(t, s) : this.parseUrl(t, s);
+  }
+
+  async byPass(t, s) {
+    return await this.checkSize(t) ? t : this.convertFile(t, s);
+  }
+
+  checkSize(t) {
     return new Promise(resolve => resolve(this.maximumSize > target));
   }
 
-  fileToDataurl(target) {
+  fileToDataurl(t) {
     return new Promise(resolve => {
       const fr = new FileReader();
 
       fr.onload = e => resolve(e.target.result);
-      fr.readAsDataURL(target);
+      fr.readAsDataURL(t);
     });
   }
 
@@ -77,7 +95,9 @@ export default class Resize {
         canvas.getContext("2d").drawImage(img, 0, 0, size.width, size.height);
 
         // url 일 경우... 300 * 1024 고정이 맞는걸까 ?
-        const origin = originSize ? Math.min(originSize, 300 * 1024) : 300 * 1024;
+        const origin = originSize
+          ? Math.min(originSize, 300 * 1024)
+          : 300 * 1024;
         let q = 0.5;
         let d = 0.5;
         let dataUrl = "";
@@ -100,8 +120,14 @@ export default class Resize {
   }
 
   urlToBlob(result, fileName) {
-    const bytes = result.split(",")[0].indexOf("base64") >= 0 ? atob(result.split(",")[1]) : encodeURI(result.split(",")[1]);
-    const mime = result.split(",")[0].split(":")[1].split(";")[0];
+    const bytes =
+      result.split(",")[0].indexOf("base64") >= 0
+        ? atob(result.split(",")[1])
+        : encodeURI(result.split(",")[1]);
+    const mime = result
+      .split(",")[0]
+      .split(":")[1]
+      .split(";")[0];
     const max = bytes.length;
     const ia = new Uint8Array(max);
 
