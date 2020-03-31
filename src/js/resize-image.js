@@ -1,9 +1,9 @@
 /**
  * resize
  * 리사이즈
- * @param {*} target File or image Url
- * @param {*} size { width: 600, height: 600 }
- * @param {*} maximumSize 최대 maximumsize
+ * @param {*} t File or image Url
+ * @param {*} s { width: 600, height: 600 }
+ * @param {*} maxSize 최대 maximumsize
  *
  * @returns {Files} 리사이징 파일 || 원본 파일 return
  */
@@ -11,8 +11,8 @@
 // array like object 유사배열 도 정상적으로 동작 하게끔.
 
 export default class Resize {
-  constructor(maximumSize) {
-    this.maximumSize = maximumSize;
+  constructor(maxSize = 1) {
+    this.maxSize = 1024 * 1024 * maxSize;
   }
 
   do(t, s) {
@@ -20,7 +20,7 @@ export default class Resize {
   }
 
   *r(t, s) {
-    return yield this.isFile(t) ? this.gOne(t, s) : this.gList(this.isDomCollection(t) ? this.pCollection([...t]) : t, s);
+    return yield this.isFile(t) ? this.gSingle(t, s) : this.gList(this.isDomCollection(t) ? this.pCollection([...t]) : t, s);
   }
 
   isFile(t) {
@@ -39,8 +39,8 @@ export default class Resize {
     return this.pPromise(t.map(v => this.isFile(v) ? this.byPass(v, s) : this.parseUrl(v, s)));
   }
 
-  gOne(t, s) {
-    return typeof t === 'string' ? this.parseUrl(t, s) : this.byPass(t, s);
+  gSingle(t, s) {
+    return typeof t === 'string' ? this.pUrl(t, s) : this.byPass(t, s);
   }
 
   async pPromise(t) {
@@ -48,14 +48,14 @@ export default class Resize {
   }
 
   async byPass(t, s) {
-    return await this.checkSize(t) ? t : this.convertFile(t, s);
+    return await this.chkSize(t) ? t : this.convertFile(t, s);
   }
 
-  checkSize(t) {
-    return new Promise(resolve => resolve(this.maximumSize > t.size));
+  chkSize(t) {
+    return new Promise(resolve => resolve(this.maxSize > t.size));
   }
 
-  fileToDataurl(t) {
+  f2u(t) {
     return new Promise(resolve => {
       const fr = new FileReader();
 
@@ -65,13 +65,13 @@ export default class Resize {
   }
 
   async convertFile(t, s) {
-    const u = await this.fileToDataurl(t);
+    const u = await this.f2u(t);
     const c = await this.convertUrl(u, s, t.size);
 
     return this.u2b(c, t.name);
   }
 
-  async parseUrl(t, s) {
+  async pUrl(t, s) {
     const c = await this.convertUrl(t, s);
     return this.u2b(c, 'download.jpg');
   }
