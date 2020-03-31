@@ -28,7 +28,7 @@ export default class Resize {
   }
 
   isDomCollection(t) {
-    return t instanceof NodeList || t instanceof HTMLCollection; ``
+    return t instanceof NodeList || t instanceof HTMLCollection;
   }
 
   pCollection(t) {
@@ -48,7 +48,6 @@ export default class Resize {
   }
 
   async byPass(t, s) {
-    // console.log(t);
     return await this.checkSize(t) ? t : this.convertFile(t, s);
   }
 
@@ -69,12 +68,12 @@ export default class Resize {
     const u = await this.fileToDataurl(t);
     const c = await this.convertUrl(u, s, t.size);
 
-    return this.urlToBlob(c, t.name);
+    return this.u2b(c, t.name);
   }
 
   async parseUrl(t, s) {
     const c = await this.convertUrl(t, s);
-    return this.urlToBlob(c, 'download.jpg');
+    return this.u2b(c, 'download.jpg');
   }
 
   convertUrl(parseUrl, size, originSize) {
@@ -114,7 +113,7 @@ export default class Resize {
     });
   }
 
-  urlToBlob(result, fileName) {
+  u2b(result, fileName) {
     const bytes =
       result.split(',')[0].indexOf('base64') >= 0 ? atob(result.split(',')[1]) : encodeURI(result.split(',')[1]);
     const mime = result
