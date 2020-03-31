@@ -8,11 +8,10 @@
  * @returns {Files} 리사이징 파일 || 원본 파일 return
  */
 // 단일 파일은 옵션 , params 로 array를 받는 interface
-// array like object도 정상적으로 동작 하게끔.
+// array like object 유사배열 도 정상적으로 동작 하게끔.
 
 export default class Resize {
   constructor(maximumSize) {
-    // 계산식 추가 필요함
     this.maximumSize = maximumSize;
   }
 
@@ -21,33 +20,35 @@ export default class Resize {
   }
 
   *r(t, s) {
-    const pA = this.pA(t);
-    return yield this.isArray(pA) ? this.gList(pA, s) : this.gOne(pA, s);
-  }
-
-  pA(t) {
-    return [...t];
+    return yield this.isFile(t) ? this.gOne(t, s) : this.gList(this.isDomCollection(t) ? this.pCollection([...t]) : t, s);
   }
 
   isFile(t) {
     return t instanceof File;
   }
 
-  isArray(t) {
-    return t instanceof Array;
+  isDomCollection(t) {
+    return t instanceof NodeList || t instanceof HTMLCollection; ``
+  }
+
+  pCollection(t) {
+    return t.map(v => v.files[0]);
   }
 
   gList(t, s) {
-    return [] = t.map(v => {
-      return this.isFile(v.files[0]) ? this.byPass(v.files[0], s) : this.parseUrl(v, s)
-    });
+    return this.pPromise(t.map(v => this.isFile(v) ? this.byPass(v, s) : this.parseUrl(v, s)));
   }
 
   gOne(t, s) {
-    return this.isFile(t) ? this.byPass(t, s) : this.parseUrl(t, s);
+    return typeof t === 'string' ? this.parseUrl(t, s) : this.byPass(t, s);
+  }
+
+  async pPromise(t) {
+    return await Promise.all(t);
   }
 
   async byPass(t, s) {
+    // console.log(t);
     return await this.checkSize(t) ? t : this.convertFile(t, s);
   }
 
