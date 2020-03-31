@@ -11,27 +11,23 @@
 // todo generator 들어가서 순서보장 로직 추가하기.
 // submodule로 thumbnail 한번 들고와서 같이 ret object로 넘겨주기.
 // resize target 단건 || array
-// ㄴ부에서 loop를 돌자
+// 내부에서 loop를 돌자
 
 // 단일 파일은 옵션 , params 로 array를 받는 interface
 // array like object도 정상적으로 동작 하게끔.
 
 export default class Resize {
   constructor(maximumSize) {
+    // 계산식 추가 필요함
     this.maximumSize = maximumSize;
   }
 
-  resize(target, size) {
+  do(target, size) {
     return this.r(target, size).next().value;
   }
 
   *r(t, s) {
-    // loop를 돌리쟈.
-    // return yield this.isFile(target)
-    //   ? this.byPass(target, size)
-    //   : this.parseUrl(target, size);
-
-    return yield this.isArray(t) ? this.gList(t, s) : this.gOne(t, s);
+    return yield this.isArray(...t) ? this.gList(t, s) : this.gOne(t, s);
   }
 
   isFile(t) {
@@ -39,12 +35,15 @@ export default class Resize {
   }
 
   isArray(t) {
+    console.log(t instanceof Array);
     return t instanceof Array;
   }
 
   gList(t) {
-    // 추후 file args에 따라서 t에 더 뭔가 붙을 수 있땨. 지금은 proto
-    return [] = arr.map(v => this.isFile(t) ? this.byPass(t) : this.parseUrl(t));
+    return [] = t.map(v => {
+      console.log(v);
+      return this.isFile(v.files[0]) ? this.byPass(v.files[0]) : this.parseUrl(t)
+    });
   }
 
   gOne(t, s) {
@@ -68,16 +67,16 @@ export default class Resize {
     });
   }
 
-  async convertFile(target, size) {
-    const dataUrl = await this.fileToDataurl(target);
-    const convertUrl = await this.convertUrl(dataUrl, size, target.size);
+  async convertFile(t, s) {
+    const u = await this.fileToDataurl(t);
+    const c = await this.convertUrl(dataUrl, s, t.size);
 
-    return this.urlToBlob(convertUrl, target.name);
+    return this.urlToBlob(c, t.name);
   }
 
-  async parseUrl(target, size) {
-    const convertUrl = await this.convertUrl(target, size);
-    return this.urlToBlob(convertUrl, "download.jpg");
+  async parseUrl(t, s) {
+    const c = await this.convertUrl(t, s);
+    return this.urlToBlob(c, 'download.jpg');
   }
 
   convertUrl(parseUrl, size, originSize) {
