@@ -7,12 +7,6 @@
  *
  * @returns {Files} 리사이징 파일 || 원본 파일 return
  */
-
-// todo generator 들어가서 순서보장 로직 추가하기.
-// submodule로 thumbnail 한번 들고와서 같이 ret object로 넘겨주기.
-// resize target 단건 || array
-// 내부에서 loop를 돌자
-
 // 단일 파일은 옵션 , params 로 array를 받는 interface
 // array like object도 정상적으로 동작 하게끔.
 
@@ -22,12 +16,17 @@ export default class Resize {
     this.maximumSize = maximumSize;
   }
 
-  do(target, size) {
-    return this.r(target, size).next().value;
+  do(t, s) {
+    return this.r(t, s).next().value;
   }
 
   *r(t, s) {
-    return yield this.isArray(...t) ? this.gList(t, s) : this.gOne(t, s);
+    const pA = this.pA(t);
+    return yield this.isArray(pA) ? this.gList(pA, s) : this.gOne(pA, s);
+  }
+
+  pA(t) {
+    return [...t];
   }
 
   isFile(t) {
@@ -35,14 +34,12 @@ export default class Resize {
   }
 
   isArray(t) {
-    console.log(t instanceof Array);
     return t instanceof Array;
   }
 
-  gList(t) {
+  gList(t, s) {
     return [] = t.map(v => {
-      console.log(v);
-      return this.isFile(v.files[0]) ? this.byPass(v.files[0]) : this.parseUrl(t)
+      return this.isFile(v.files[0]) ? this.byPass(v.files[0], s) : this.parseUrl(v, s)
     });
   }
 
@@ -55,7 +52,7 @@ export default class Resize {
   }
 
   checkSize(t) {
-    return new Promise(resolve => resolve(this.maximumSize > target));
+    return new Promise(resolve => resolve(this.maximumSize > t.size));
   }
 
   fileToDataurl(t) {
@@ -69,7 +66,7 @@ export default class Resize {
 
   async convertFile(t, s) {
     const u = await this.fileToDataurl(t);
-    const c = await this.convertUrl(dataUrl, s, t.size);
+    const c = await this.convertUrl(u, s, t.size);
 
     return this.urlToBlob(c, t.name);
   }
@@ -81,30 +78,28 @@ export default class Resize {
 
   convertUrl(parseUrl, size, originSize) {
     return new Promise(resolve => {
-      let canvas = document.createElement("canvas");
+      let canvas = document.createElement('canvas');
       let img = new Image();
 
       img.src = parseUrl;
-      img.crossOrigin = "anonymous";
+      img.crossOrigin = 'anonymous';
 
       img.onload = () => {
         canvas.width = size.width || 600;
         canvas.height = size.height || 600;
 
-        canvas.getContext("2d").drawImage(img, 0, 0, size.width, size.height);
+        canvas.getContext('2d').drawImage(img, 0, 0, size.width, size.height);
 
         // url 일 경우... 300 * 1024 고정이 맞는걸까 ?
-        const origin = originSize
-          ? Math.min(originSize, 300 * 1024)
-          : 300 * 1024;
+        const origin = originSize ? Math.min(originSize, 300 * 1024) : 300 * 1024;
         let q = 0.5;
         let d = 0.5;
-        let dataUrl = "";
-        let encUrl = "";
+        let dataUrl = '';
+        let encUrl = '';
 
         for (let i = 0; i < 7; i++) {
-          dataUrl = canvas.toDataURL("image/jpeg", q);
-          encUrl = atob(dataUrl.replace("data:image/jpeg;base64,", "")).length;
+          dataUrl = canvas.toDataURL('image/jpeg', q);
+          encUrl = atob(dataUrl.replace('data:image/jpeg;base64,', "")).length;
 
           if (encUrl > origin) {
             q -= d /= 2;
@@ -120,13 +115,11 @@ export default class Resize {
 
   urlToBlob(result, fileName) {
     const bytes =
-      result.split(",")[0].indexOf("base64") >= 0
-        ? atob(result.split(",")[1])
-        : encodeURI(result.split(",")[1]);
+      result.split(',')[0].indexOf('base64') >= 0 ? atob(result.split(',')[1]) : encodeURI(result.split(',')[1]);
     const mime = result
-      .split(",")[0]
-      .split(":")[1]
-      .split(";")[0];
+      .split(',')[0]
+      .split(':')[1]
+      .split(';')[0];
     const max = bytes.length;
     const ia = new Uint8Array(max);
 

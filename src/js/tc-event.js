@@ -25,7 +25,5 @@ document.getElementById('tc').addEventListener('click', e => {
 
   const files = document.getElementsByName('uploadfile');
 
-  console.log(files);
-
   resize.do(files, size).then(resp => console.log(resp));
 });
