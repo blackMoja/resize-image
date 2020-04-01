@@ -11,8 +11,8 @@
 // array like object 유사배열 도 정상적으로 동작 하게끔.
 
 export default class Resize {
-  constructor(maxSize = 1) {
-    this.maxSize = 1024 * 1024 * maxSize;
+  constructor(maxSize) {
+    this.maxSize = 1024 * 1024 * maxSize ? maxSize : 1;
   }
 
   do(t, s) {
