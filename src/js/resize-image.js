@@ -7,12 +7,10 @@
  *
  * @returns {Files} 리사이징 파일 || 원본 파일 return
  */
-// 단일 파일은 옵션 , params 로 array를 받는 interface
-// array like object 유사배열 도 정상적으로 동작 하게끔.
 
 export default class Resize {
-  constructor(maxSize) {
-    this.maxSize = 1024 * 1024 * maxSize ? maxSize : 1;
+  constructor(maxSize = 300) {
+    this.maxSize = maxSize * 1024;
   }
 
   do(t, s) {
@@ -20,6 +18,7 @@ export default class Resize {
   }
 
   *r(t, s) {
+    // map symbol function
     return yield this.isFile(t) ? this.gSingle(t, s) : this.gList(this.isDomCollection(t) ? this.pCollection([...t]) : t, s);
   }
 
@@ -90,8 +89,8 @@ export default class Resize {
 
         canvas.getContext('2d').drawImage(img, 0, 0, size.width, size.height);
 
-        // url 일 경우... 300 * 1024 고정이 맞는걸까 ?
-        const origin = originSize ? Math.min(originSize, 300 * 1024) : 300 * 1024;
+        // maxsize
+        const origin = originSize ? Math.min(originSize, this.maxSize) : this.maxSize;
         let q = 0.5;
         let d = 0.5;
         let dataUrl = '';
