@@ -18,7 +18,6 @@ export default class Resize {
   }
 
   *r(t, s) {
-    // map symbol function
     return yield this.isFile(t) ? this.gSingle(t, s) : this.gList(this.isDomCollection(t) ? this.pCollection([...t]) : t, s);
   }
 
@@ -89,7 +88,6 @@ export default class Resize {
 
         canvas.getContext('2d').drawImage(img, 0, 0, size.width, size.height);
 
-        // maxsize
         const origin = originSize ? Math.min(originSize, this.maxSize) : this.maxSize;
         let q = 0.5;
         let d = 0.5;
