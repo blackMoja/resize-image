@@ -1,0 +1,49 @@
+@import url(./reset.css);
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  height: 100%;
+}
+
+#app .panelContainer {
+  margin: 12px 0;
+
+  width: 500px;
+  height: 500px;
+
+  cursor: default;
+}
+#app .panelContainer .panel {
+  height: 100%;
+  border: 1px dashed black;
+  border-radius: 8px;
+}
+#app .panelContainer .panel .panel-body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+
+  color: gray;
+}
+
+#app .table {
+  margin-top: 16px;
+  width: 700px;
+}
+
+#app .table .row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

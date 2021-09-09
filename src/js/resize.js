@@ -8,17 +8,19 @@
  * @returns {Files} 리사이징 파일 || 원본 파일 return
  */
 
-export default class Resize {
+class Resize {
   constructor(maxSize = 300) {
     this.maxSize = maxSize * 1024;
   }
 
-  do(t, s) {
+  do(t, s = { width: 600, height: 600 }) {
     return this.r(t, s).next().value;
   }
 
   *r(t, s) {
-    return yield this.isFile(t) ? this.gSingle(t, s) : this.gList(this.isDomCollection(t) ? this.pCollection([...t]) : t, s);
+    return yield this.isFile(t)
+      ? this.gSingle(t, s)
+      : this.gList(this.isDomCollection(t) ? this.pCollection([...t]) : t, s);
   }
 
   isFile(t) {
@@ -34,7 +36,9 @@ export default class Resize {
   }
 
   gList(t, s) {
-    return this.pPromise(t.map(v => this.isFile(v) ? this.byPass(v, s) : this.parseUrl(v, s)));
+    return this.pPromise(
+      t.map(v => (this.isFile(v) ? this.byPass(v, s) : this.parseUrl(v, s)))
+    );
   }
 
   gSingle(t, s) {
@@ -46,7 +50,7 @@ export default class Resize {
   }
 
   async byPass(t, s) {
-    return await this.chkSize(t) ? t : this.convertFile(t, s);
+    return (await this.chkSize(t)) ? t : this.convertFile(t, s);
   }
 
   chkSize(t) {
@@ -88,7 +92,9 @@ export default class Resize {
 
         canvas.getContext('2d').drawImage(img, 0, 0, size.width, size.height);
 
-        const origin = originSize ? Math.min(originSize, this.maxSize) : this.maxSize;
+        const origin = originSize
+          ? Math.min(originSize, this.maxSize)
+          : this.maxSize;
         let q = 0.5;
         let d = 0.5;
         let dataUrl = '';
@@ -96,7 +102,7 @@ export default class Resize {
 
         for (let i = 0; i < 7; i++) {
           dataUrl = canvas.toDataURL('image/jpeg', q);
-          encUrl = atob(dataUrl.replace('data:image/jpeg;base64,', "")).length;
+          encUrl = atob(dataUrl.replace('data:image/jpeg;base64,', '')).length;
 
           if (encUrl > origin) {
             q -= d /= 2;
@@ -112,11 +118,10 @@ export default class Resize {
 
   u2b(result, fileName) {
     const bytes =
-      result.split(',')[0].indexOf('base64') >= 0 ? atob(result.split(',')[1]) : encodeURI(result.split(',')[1]);
-    const mime = result
-      .split(',')[0]
-      .split(':')[1]
-      .split(';')[0];
+      result.split(',')[0].indexOf('base64') >= 0
+        ? atob(result.split(',')[1])
+        : encodeURI(result.split(',')[1]);
+    const mime = result.split(',')[0].split(':')[1].split(';')[0];
     const max = bytes.length;
     const ia = new Uint8Array(max);
 
@@ -125,3 +130,5 @@ export default class Resize {
     return new File([new Blob([ia], { type: mime })], fileName, { type: mime });
   }
 }
+
+export default Resize;

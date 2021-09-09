@@ -4,9 +4,8 @@
   "description": "- 이미지 리사이징 모듈\r - **promise**기반으로 되어 있기 때문에 아래와 같은 polyfill import가 필요함.\r   ```html\r   <!-- Automatically provides/replaces `Promise` if missing or broken. -->\r   <script src=\"https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.js\"></script>\r   <script src=\"https://cdn.jsdelivr.net/npm/es6-promise@4/dist/es6-promise.auto.js\"></script>",
   "main": "index.js",
   "scripts": {
-    "prod-build": "NODE_ENV=production webpack -p",
-    "dev-build": "NODE_ENV=development webpack -p",
-    "dev-server": "NODE_ENV=development webpack-dev-server --hot",
+    "start": "parcel src/index.html",
+    "build": "parcel build entry.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,22 +19,15 @@
     "url": "https://github.com/blackMoja/resize-image/issues"
   },
   "homepage": "https://github.com/blackMoja/resize-image#readme",
-  "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.4",
-    "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/plugin-transform-runtime": "^7.8.3",
-    "@babel/preset-env": "^7.8.4",
-    "@babel/runtime": "^7.8.7",
-    "babel-loader": "^8.0.6",
-    "clean-webpack-plugin": "^3.0.0",
-    "html-loader": "^0.5.5",
-    "html-webpack-plugin": "^3.2.0",
-    "webpack": "^4.41.6",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3"
-  },
+  "devDependencies": {},
   "dependencies": {
-    "@babel/polyfill": "^7.8.3"
-  }
+    "parcel-bundler": "^1.12.5"
+  },
+  "browserslist": [
+    "last 3 and_chr versions",
+    "last 3 chrome versions",
+    "last 3 opera versions",
+    "last 3 ios_saf versions",
+    "last 3 safari versions"
+  ]
 }
