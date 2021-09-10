@@ -41,9 +41,21 @@ body {
   margin-top: 16px;
   width: 700px;
 }
+#app .table td {
+  text-align: center;
+}
 
+#app .table .row::before {
+  content: unset;
+}
+#app .table .row::after {
+  content: unset;
+}
 #app .table .row {
   display: flex;
-  align-items: center;
+  flex: 1;
   justify-content: space-between;
+
+  margin: 0px;
 }
+

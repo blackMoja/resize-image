@@ -3,57 +3,84 @@ import Resize from './js/resize';
 const resize = new Resize();
 
 class App {
-  panelEl;
-  tbodyEl;
+  resizeFiles;
 
   constructor() {
-    this.panelEl = document.getElementById('panel');
-    this.tbodyEl = document.querySelector('tbody');
-
+    this.resizeFiles = [];
     this.setEvent();
   }
 
-  renderTable(files) {
+  renderTable() {
+    const target = document.querySelector('tbody');
     let row = '';
 
-    files.forEach(({ origin, resize }) => {
-      row += '<tr>'
-      row += `<td><div class='row'><span>${origin.name}</span> | <span>${origin.size}</span></div></td>`;
-      row += `<td><div class='row'><span>${resize.name}</span> | <span>${resize.size}</span></div></td>`;
-      row += '</tr>'
+    this.resizeFiles.forEach(({ origin, resize }, index) => {
+      row += '<tr>';
+      row += `<td><div class='row'><div>${origin.name}</div><div>${origin.size}</div></div></td>`;
+      row += `<td><div class='row'><div>${resize.name}</div><div>${resize.size}</div></div></td>`;
+      row += `<td><button type="button" data-index=${index} class="btn btn-success">다운로드</button></td>`;
+      row += '</tr>';
     });
 
-    this.tbodyEl.innerHTML = row;
+    target.innerHTML = row;
   }
 
   handleDrop = event => {
     event.preventDefault();
+    const el = event.target.className;
+
+    if (el !== 'panel-body') {
+      return;
+    }
 
     const files = !!event.dataTransfer.items
       ? [...event.dataTransfer.items]
       : [...event.dataTransfer.files];
-    const resizeFiles = [];
 
     files.forEach(async file => {
       if (file.kind !== 'file') {
         return;
       }
 
-      resizeFiles.push({
+      this.resizeFiles.push({
         origin: file.getAsFile(),
         resize: await resize.do(file.getAsFile()),
       });
 
-      resizeFiles.length === files.length && this.renderTable(resizeFiles);
+      this.resizeFiles.length === files.length && this.renderTable();
     });
   };
   handleDragOver = event => {
     event.preventDefault();
   };
+  handleClick = event => {
+    const nodeName = event.target.nodeName;
+
+    if (nodeName !== 'BUTTON') {
+      return;
+    }
+
+    const index = event.target.dataset.index;
+    const { resize } = this.resizeFiles[index];
+
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = URL.createObjectURL(resize);
+    link.download = resize.name;
+
+    document.body.appendChild(link);
+    link.click();
+
+    setTimeout(() => {
+      URL.revokeObjectURL(link.href);
+      link.parentNode.removeChild(link);
+    }, 0);
+  };
 
   setEvent() {
-    this.panelEl.addEventListener('drop', this.handleDrop);
-    this.panelEl.addEventListener('dragover', this.handleDragOver);
+    window.addEventListener('drop', this.handleDrop);
+    window.addEventListener('dragover', this.handleDragOver);
+    window.addEventListener('click', this.handleClick);
   }
 }
 
