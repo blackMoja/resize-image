@@ -1,42 +1,27 @@
 # resize-image
 
-- 이미지 리사이징 모듈
-- **webpack**기반으로 되어 있기 때문에 `npm script`에 있는 명령어들만 잘 사용하면 됨.
+리사이징 모듈 입니다. <br />
+JPEG 기반으로 Q 펙터를 조절하여 이미지에 맞는 해상도를 찾아서 리사이징을 진행 합니다.
 
-- ## build
-  - prod : entry => resize-image.js
-  - dev : entry => tc-event.js
+### npm script
 
-- ## npm script
-  - prod-build : prod 버전 build
-  - dev-server : webpack-dev-server 기동
+`npm run start` resize 모듈을 테스트 할 수 있는 명령어 입니다.
 
-- ## use
-  ```javascript
-  document.getElementById('resize').addEventListener('change', (e) => {
-    const resize = new Resize(1000000);
-    const file = e.target.files[0];
-    const size = { width: 600, height: 600 };
+### example
 
-    console.log(`File start : ${file}`);
+아래는 간단한 예제 입니다.
+내부적으로 generator와 promise 기반의 로직으로 구성되어 있어 순서보장도 같이 진행하고 있습니다.
 
-    resize.resize(file, size)
-      .then(resp => console.log('File result : ', resp));
+```javascript
+const origin = !!event.dataTransfer.items
+  ? [...event.dataTransfer.items]
+  : [...event.dataTransfer.files];
+const resizeFiles = [];
+
+origin.forEach(async file => {
+  this.resizeFiles.push({
+    origin: file.getAsFile(),
+    resize: await resize.do(file.getAsFile()),
   });
-
-  document.getElementById('urlTest').addEventListener('click', (e) => {
-    const resize = new Resize(1000000);
-    const targetUrl = 'imgUrl';
-    const size = { width: 600, height: 600 };
-
-    console.log(`Url start : ${targetUrl}`);
-
-    resize.resize(targetUrl, size)
-      .then(resp => console.log('Url result : ', resp));
-  });
-  ```
-
-## todo
-  - `generator` 사용하여 순서 보장
-  - `new Resize()`로 생성 시 `target size`에 대한 계산 구현 예정 
-  - url 이미지를 canvas 에 그려서 해당 이미지를 `resize`시 해당 origine size에 대한 고민
+});
+```

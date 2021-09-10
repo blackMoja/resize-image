@@ -1,42 +1,50 @@
 <!DOCTYPE html>
 <html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Resize Image</title>
 
-  <title>Document</title>
+    <link href="./css/index.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css"
+    />
+  </head>
 
-</head>
+  <body>
+    <div id="app">
+      <h1><img alt="로고" src="css/logo.png" /></h1>
+      <h3>이미지 파일을 아래 영역에 드레그 해보세요 🚀</h3>
 
-<body>
-  <h1>이미지 파일 리사이징</h1>
-  <br>
+      <div class="panelContainer" id="panel">
+        <div class="panel panel-default">
+          <div class="panel-body">📦 이미지를 리사이징 합니다.</div>
+        </div>
+      </div>
 
-  <div>
-    <h2>fileList || file</h2>
-    <input type="file" name="uploadfile" />
-    <br>
-    <input type="file" name="uploadfile" />
+      <div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>📦 &nbsp; 리사이징 전</th>
+              <th>📦 &nbsp; 리사이징 후</th>
+              <th>🚀 &nbsp; 다운로드</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>리사이징 된 파일이 없습니다.</td>
+              <td>리사이징 된 파일이 없습니다.</td>
+              <td>X</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-    <button id="tc">tc시작</button>
-  </div>
-
-  <div>
-    <h2>file change event</h2>
-    <input type="file" id="change">
-  </div>
-
-  <div>
-    <h2>formData</h2>
-    <form id="tcForm" name="tcForm">
-      <input type="file" name="uploadfile_form">
-      <input type="file" name="uploadfile_form">
-      <input type="file" name="uploadfile_form">
-
-      <button id="formTc">formTc</button>
-    </form>
-  </div>
-
+    <script src="./index.js"></script>
+  </body>
 </html>
